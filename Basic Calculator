@@ -1,26 +1,33 @@
-#---calculator---#
-print("//<---Calculator--->\\\\")
-def main():
-    while True :
-            try :
-                num1 = float(input("Enter First Num: "))
-                num2 = float(input("Enter Second Num: "))
-                break
-            except ValueError :
-                print(" ---Again Enter a Num--- ")
-   
-    #opertion you want to perform ...
-    print("Select The arithmetic operation :")
-    operations = ("Sum", "Diff", "Multi", "Divi")
-    print(operations)
-    op = input().strip().lower()
-    #on the base of select op...
-    if op == "sum":
-        print(add(num1, num2))
-    elif op == "diff":
-        print(diff(num1, num2))
-    elif op == "multi":
-        print(multi(num1, num2))
+from time import sleep
+while True :
+    try :
+        num1 = float(input("Enter 1st Number : "))
+        num2 = float(input("Enter 2nd Number : "))
+        break
+    except ValueError :
+        print("---AGAIN ENTER NUMBERS---")
+        continue
+
+print("Select operation","\n[ Add , Sub , Multi , Divi ]")
+while True :
+    op = input("Enter : ").strip().capitalize()
+    print("loading...")
+    sleep(2)
+
+    match op:
+        case "Add" | "Sub" | "Multi" | "Divi":
+            break
+        case _:
+            print("---Again Enter Correct Operation---")
+            continue
+
+def main() :
+    if op == "Add":
+            print(add(num1, num2))
+    elif op == "Sub":
+            print(diff(num1, num2))
+    elif op == "Multi":
+            print(multi(num1, num2))
     elif op == "divi":
         if num2 == 0:
             print("Can't Be Divided By Zero")
@@ -28,7 +35,6 @@ def main():
             print(divi(num1, num2))
     else:
         print("Invalid Operation!")
-
 #funtion for addition of two number...
 def add(num1, num2):
     return num1 + num2
@@ -44,6 +50,4 @@ def multi(num1, num2):
 #funtion for division of two number...
 def divi(num1, num2):
     return num1 / num2
-
-
 main()
