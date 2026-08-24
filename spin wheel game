@@ -1,0 +1,34 @@
+import time
+import random 
+print("let's play spin the wheel".title())
+
+def spin_wheel ():
+    b = 10
+    print(f"\nCurrent Balance {b}")
+    while True :
+        if b > 0 :
+            reward = random.randint(1,100)
+            input("Press Enter for spin...▶️")
+            print("Spining...",end="\n")
+
+            frames = ['𒅒','𒈔','𒅒','𒇫','𒄆']
+            for _ in range(3):
+                for frame in frames:
+                    print(frame, end="\r", flush=True)
+                    time.sleep(0.1)
+
+            if reward in range(1, 6):
+                print("==>✨MYTHIC ITEM✨")
+            elif 6 <= reward <=20 :
+                print("==>🎁COMMEN ITEM🎁")
+            else :
+                print("==>🗑️TRASH ITEM🗑️")
+            time.sleep(.5)
+            b -= 1
+            print(f"\nBalance Left {b}")
+        if b == 0 :
+            print("==no balance left for spin==".title())
+            break
+
+        
+spin_wheel()
