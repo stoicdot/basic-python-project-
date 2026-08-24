@@ -1,0 +1,24 @@
+import random 
+import time
+print("--- Guess HEADS or TAILS ---")
+choice = ["HEADS","TAILS"]
+print("Select (HEADS/TAILS)")
+while True :
+    a = input("Enter : ").strip().upper()
+    match a : 
+        case "HEADS" | "TAILS" :
+            break
+        case _ : 
+            print("Enter Again")
+            continue
+   
+print("You Choose",a,sep=" - ")
+print("FLIPPING....",end="",flush=True)
+result = random.choice(choice)
+time.sleep(3)
+print("\rCoin Lands on ",result)
+time.sleep(0.5)
+if a == result :
+    print("--Win--")
+else :
+    print("--Lose--")
