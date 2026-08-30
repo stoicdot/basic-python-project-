@@ -1,0 +1,39 @@
+import time 
+
+Toal_Amount={"Balance":0}
+print("==Mini ATM==",end="\n")
+while True :
+    print("="*56)
+    print("\n1. DEPOSIT | 2. WITHDRAWAL | 3. CHECK BALANCE | 4. EXIT")
+    op=int(input("\nEnter: "))
+    if op == 1 :
+        print("="*20)
+        d=int(input("\nEnter Amount: "))
+        time.sleep(0.5)
+        print("Done...")
+        Toal_Amount["Balance"]+=d
+        time.sleep(1)
+    elif op == 2:
+        print("="*20)
+        w=int(input("\nEnter Amount: "))
+        time.sleep(0.5)
+        if w>Toal_Amount["Balance"] :
+            print("="*20)
+            print("INSUFFICANT BALANCE")
+            time.sleep(0.2)
+            print("HAHAHAHA...BROKE")
+            time.sleep(0.5)
+            print(f"CURRENT BALANCE: {Toal_Amount['Balance']:,}/-")
+            time.sleep(1)
+        else :
+            Toal_Amount["Balance"]-=w
+            print("="*20)
+            print("WITHDRAWAL DONE...")
+            print("THANKS FOR USING...")
+            time.sleep(1)
+    elif op == 3:
+        print(f"CURRENT BALANCE: {Toal_Amount['Balance']:,}/-")
+        time.sleep(3)
+    elif op == 4:
+        print("\nTHANKS FOR USING...")
+        break
