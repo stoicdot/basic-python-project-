@@ -1,0 +1,36 @@
+import random
+import time
+
+print("Lets play a game of rock paper scissor")
+time.sleep(1)
+
+choices = ["rock", "paper", "scissor"]
+score = 0
+
+while True:
+    a = input("\nSelect your choice: ").lower()
+    
+    if a not in choices:
+        print("Your choice is Invalid, choose again")
+        continue
+
+    print("Your choice :", a)
+    time.sleep(0.5)
+    
+    b = random.choice(choices)
+    print("opp choice :", b)
+    time.sleep(0.5)
+
+    if a == b:
+        print("Draw")
+    elif (a == "rock" and b == "scissor") or \
+         (a == "paper" and b == "rock") or \
+         (a == "scissor" and b == "paper"):
+        print("You win")
+        score += 1
+    else:
+        print("You lose")
+        score -= 1
+
+    print("Score :", score)
+    time.sleep(1)
