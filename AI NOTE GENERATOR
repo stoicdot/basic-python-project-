@@ -1,0 +1,85 @@
+import sys
+import time
+import itertools
+import threading
+from dotenv import load_dotenv
+from google import genai
+import os
+
+load_dotenv()
+
+def main():
+    print("=== AI Summary Study Notes Generator ===")
+    user_topic = input("Enter a topic or concept: ")
+
+    try:
+        cleaned_topic = clean_input(user_topic)
+    except ValueError as e:
+        print(f"\nError: {e}")
+        sys.exit(1)
+    
+    prompt = build_prompt(cleaned_topic)
+
+    stop_loading = False
+    spinner_thread = threading.Thread(target=animate_loading, args=(lambda: stop_loading,))
+    spinner_thread.start()
+
+    try:
+        result = call_gemini(prompt)
+    except Exception as e:
+        stop_loading = True
+        spinner_thread.join()
+        print(f"\nAPI Error: {e}")
+        sys.exit(1)
+    finally:
+        # Loading Stop
+        stop_loading = True
+        spinner_thread.join()
+
+    print("\n--- AI Response ---")
+    print(result)
+
+def clean_input(text: str) -> str:
+    cleaned = text.strip()
+    if not cleaned:
+        raise ValueError("Topic cannot be empty.")
+    if len(cleaned) < 3:
+        raise ValueError("Topic must be at least 3 characters long.")
+    return cleaned
+
+def build_prompt(topic: str) -> str:
+    return (
+        f"Generate clear study summary  "
+        f"for the topic: '{topic}'."
+    )
+
+def call_gemini(prompt_text: str) -> str:
+    api_key = os.getenv("GEMINI_API_KEY)
+    client = genai.Client(api_key=api_key)
+
+    # 1. Terminal warning mute karo
+    old_stderr = sys.stderr
+    sys.stderr = open(os.devnull, "w")
+
+    response = client.models.generate_content(
+        model="gemini-3.6-flash",
+        contents=prompt_text,
+    )
+    sys.stderr = old_stderr
+
+    return response.text.strip()
+
+# Loading Animation Worker
+def animate_loading(stop_flag):
+    frames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏']
+    for frame in itertools.cycle(frames):
+        if stop_flag():
+            break
+        sys.stdout.write(f"\rAI is thinking {frame} ")
+        sys.stdout.flush()
+        time.sleep(0.1)
+    sys.stdout.write("\r" + " " * 30 + "\r") 
+    sys.stdout.flush()
+
+if __name__ == "__main__":
+    main()
