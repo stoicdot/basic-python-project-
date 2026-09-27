@@ -1,0 +1,68 @@
+import streamlit as st
+from google import genai
+from dotenv import load_dotenv
+load_dotenv()
+st.title("AI MOVIE RECOMMANDATER \n GIVE BEST MOVIE FOR EACH GENRE")
+st.subheader("ENTER THE GENRE")
+
+# 1. Language Selection
+type1 = st.radio("LANGUAGE", ["HOLLYWOOD", "BOLLYWOOD"])
+
+# 2. Type Selection
+type2 = st.radio("TYPE", ["SUB", "DUB"])
+
+# 3. Genre Selection
+genre1 = st.radio(
+    "GENRE", 
+    ["ACTION", "COMEDY", "DRAMA", "HORROR", "ROMANCE", "SCIENCE FICTION"]
+)
+
+# Single Final Button
+submit = st.button("GET RECOMMENDATION / SUBMIT")
+
+if submit:
+    st.divider()
+    
+    # Language Detail
+    if type1 == "HOLLYWOOD":
+        st.success("LANGUAGE: HOLLYWOOD - AMERICAN CINEMA KNOWN FOR GLOBAL REACH, ADVANCED VFX, AND LARGE-SCALE PRODUCTIONS.")
+    elif type1 == "BOLLYWOOD":
+        st.success("LANGUAGE: BOLLYWOOD - HINDI CINEMA KNOWN FOR RICH STORYTELLING, EMOTIONS, DRAMA, AND MUSICAL ENTERTAINMENT.")
+        
+    st.info(f"AUDIO TYPE: {type2}".upper())
+    
+    if genre1 == "ACTION":
+        st.success(f"GENRE: {genre1} - FEATURES HIGH-STAKES RISKS, PHYSICAL STUNTS, AND INTENSE FIGHT SCENES.")
+    elif genre1 == "COMEDY":
+        st.success(f"GENRE: {genre1} - EMPHASIZES HUMOR, FUNNY DIALOGUES, AND LIGHT-HEARTED ENTERTAINMENT.")
+    elif genre1 == "DRAMA":
+        st.success(f"GENRE: {genre1} - FOCUSES ON REALISTIC CHARACTERS, DEEP EMOTIONAL CONFLICTS, AND STORYLINE.")
+    elif genre1 == "HORROR":
+        st.success(f"GENRE: {genre1} - DESIGNED TO SCARE, CREATE TENSION, SUSPENSE, AND DREAD.")
+    elif genre1 == "ROMANCE":
+        st.success(f"GENRE: {genre1} - EXPLORES LOVE STORIES, RELATIONSHIPS, AND PASSIONATE JOURNEYS.")
+    elif genre1 == "SCIENCE FICTION":
+        st.success(f"GENRE: {genre1} - FEATURES FUTURISTIC SCIENCE, TIME TRAVEL, SPACE, AND ADVANCED TECHNOLOGY.")
+
+api_key = os.getenv("GEMINI_API_KEY")
+prompt = f"""
+Act as an expert film critic. Recommend the TOP 10 BEST {type1} movies in the {genre1} genre (available in {type2}).
+
+STRICT INSTRUCTIONS:
+1. Provide exactly 10 movies ranked strictly from #1 (Best) down to #10 based on IMDb rating.
+2. The output must be ALL IN UPPERCASE LETTERS.
+3. Do not include introductory text, conversational fluff, or conclusion.
+4. The title should be highlighted 
+
+Use this exact format for each movie:
+
+1. [MOVIE NAME] ([RELEASE YEAR]) | IMDB: [RATING]/10
+   - WHY IT'S BEST: [1 sentence reason]
+   - LOGLINE: [1 sentence plot overview]
+"""
+client = genai.Client(api_key=api_key)
+response = client.models.generate_content(
+        model="gemini-3.6-flash",
+        contents=prompt,
+)
+st.write(response.text.upper())
