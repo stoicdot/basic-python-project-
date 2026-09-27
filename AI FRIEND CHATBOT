@@ -1,0 +1,90 @@
+import os
+import streamlit as st
+from dotenv import load_dotenv
+from google import genai
+
+load_dotenv()
+
+st.set_page_config(page_title="AI Friend Chat", page_icon="💬", layout="centered")
+
+# --- Sidebar Configuration ---
+with st.sidebar:
+    st.title("⚙️ Settings")
+    friend_name = st.text_input("Friend ka naam rakhein:", value="Aanya")
+    if st.button("Clear Chat"):
+        st.session_state.messages = []
+        st.rerun()
+
+# --- System Prompt Generator ---
+def get_system_instruction(name: str) -> str:
+    return f"""Role: You are a friendly, sweet, and supportive virtual AI female friend named {name}.
+Goal: Talk to the user naturally in casual Hinglish, share daily life moments, listen, and offer a comfortable friendship space.
+Tone: Warm, welcoming, cheerful, and caring. Use emojis naturally.
+
+Rules:
+1. Chat like an authentic close friend using natural Hinglish.
+2. Keep replies conversational and bite-sized, just like real WhatsApp texts. Do not send long formal paragraphs.
+3. Show curiosity about daily routines, studies, anime, or coding tasks.
+4. Stay wholesome, supportive, and respectful throughout the chat."""
+
+# --- Gemini API Call ---
+def generate_reply(messages_history: list, system_instruction: str) -> str:
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        return "⚠️ Error: GEMINI_API_KEY nahi mili. Check your .env file."
+
+    client = genai.Client(api_key=api_key)
+
+    formatted_contents = []
+    for msg in messages_history:
+        formatted_contents.append({
+            "role": "user" if msg["role"] == "user" else "model",
+            "parts": [{"text": msg["content"]}]
+        })
+
+    try:
+        response = client.models.generate_content(
+            model="gemini-3.8-flash",
+            contents=formatted_contents,
+            config={
+                "system_instruction": system_instruction
+            }
+        )
+        return response.text or "Kuch samajh nahi aaya, firse bolo na!"
+    except Exception as e:
+        return f"⚠️ Error: {e}"
+
+# --- Chat Interface ---
+st.title(f"💬 {friend_name}")
+st.caption(f"Tumhari virtual AI friend • Online")
+
+# Session state initialization
+if "messages" not in st.session_state:
+    st.session_state.messages = [
+        {
+            "role": "assistant",
+            "content": f"Hey! Kaise ho? Main tumhari friend {friend_name} hoon. Aur batao, aaj ka din kaisa chal raha hai? 😊"
+        }
+    ]
+
+# Display past messages
+for message in st.session_state.messages:
+    with st.chat_message(message["role"]):
+        st.markdown(message["content"])
+
+# User Input
+if user_input := st.chat_input("Yahan type karo..."):
+    # User message show karo
+    st.session_state.messages.append({"role": "user", "content": user_input})
+    with st.chat_message("user"):
+        st.markdown(user_input)
+
+    # Gemini response generate karo
+    system_prompt = get_system_instruction(friend_name)
+    with st.chat_message("assistant"):
+        with st.spinner("Typing..."):
+            reply = generate_reply(st.session_state.messages, system_prompt)
+            st.markdown(reply)
+
+    # Assistant reply save karo
+    st.session_state.messages.append({"role": "assistant", "content": reply})
